@@ -2,7 +2,6 @@
 	graph
 	This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -29,7 +28,19 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (node1, node2, weight) = edge;
+
+        // 自动添加不存在的节点
+        if !self.contains(node1) {
+            self.add_node(node1);
+        }
+        if !self.contains(node2) {
+            self.add_node(node2);
+        }
+
+        // 为无向图添加边，需要在两个节点的邻接表中互相添加对方
+        self.adjacency_table.entry(node1.to_string()).or_default().push((node2.to_string(), weight));
+        self.adjacency_table.entry(node2.to_string()).or_default().push((node1.to_string(), weight));
     }
 }
 pub trait Graph {
@@ -37,11 +48,27 @@ pub trait Graph {
     fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
-        //TODO
-		true
+        if !self.contains(node) {
+            self.adjacency_table_mutable().insert(node.to_string(), Vec::new());
+            true
+        } else {
+            false
+        }
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (node1, node2, weight) = edge;
+
+        // Automatically add nodes if they don't exist
+        if !self.contains(node1) {
+            self.add_node(node1);
+        }
+        if !self.contains(node2) {
+            self.add_node(node2);
+        }
+
+        // Add the edge in both directions since this is an undirected graph
+        self.adjacency_table_mutable().entry(node1.to_string()).or_default().push((node2.to_string(), weight));
+        self.adjacency_table_mutable().entry(node2.to_string()).or_default().push((node1.to_string(), weight));
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()

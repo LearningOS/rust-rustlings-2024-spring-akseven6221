@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,8 +36,22 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count += 1;
+        self.items.push(value);
+        
+        // 从新元素开始向上调整，直到满足堆的性质
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
     }
+    
 
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
@@ -57,9 +70,17 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_child_idx = self.left_child_idx(idx);
+        let right_child_idx = self.right_child_idx(idx);
+    
+        // 如果右子节点不存在或者左子节点小于右子节点，返回左子节点的索引
+        if right_child_idx > self.count || (self.comparator)(&self.items[left_child_idx], &self.items[right_child_idx]) {
+            left_child_idx
+        } else {
+            right_child_idx
+        }
     }
+    
 }
 
 impl<T> Heap<T>
@@ -84,9 +105,28 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        // 取出堆顶元素
+        let root = self.items.swap_remove(1);
+        self.count -= 1;
+    
+        // 重新调整堆的结构，确保剩余元素仍然构成一个堆
+        let mut idx = 1;
+        while self.children_present(idx) {
+            let smallest_child = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[smallest_child], &self.items[idx]) {
+                self.items.swap(idx, smallest_child);
+                idx = smallest_child;
+            } else {
+                break;
+            }
+        }
+    
+        Some(root)
     }
+    
 }
 
 pub struct MinHeap;

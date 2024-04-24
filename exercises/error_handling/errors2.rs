@@ -19,16 +19,30 @@
 // Execute `rustlings hint errors2` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
 use std::num::ParseIntError;
 
 pub fn total_cost(item_quantity: &str) -> Result<i32, ParseIntError> {
     let processing_fee = 1;
     let cost_per_item = 5;
-    let qty = item_quantity.parse::<i32>();
+    let qty = item_quantity.parse::<i32>()?; // 使用 ? 运算符来传播错误
 
-    Ok(qty * cost_per_item + processing_fee)
+    match item_quantity.parse::<i32>() { // 直接使用 qty 变量
+        Ok(qty) => {
+            // 成功解析为 i32 类型，说明是一个合法的数字
+            Ok(qty * cost_per_item + processing_fee)
+        }
+        Err(e) => {
+            // 解析失败，直接返回错误
+            Err(e)
+        }
+    }
+
+    // let res = match item_quantity {
+    //     Ok(value) => return Ok(qty.unwrap() * cost_per_item + processing_fee),
+    //     Err(error) => return "invalid digit found in string",
+    // };
+    // Ok(qty.unwrap() * cost_per_item + processing_fee)
 }
 
 #[cfg(test)]
